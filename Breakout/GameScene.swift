@@ -13,13 +13,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     private var ball: SKSpriteNode!
     private var bottomOfScreen: SKShapeNode!
     private let tileTypes = ["redTile", "blueTile", "greenTile", "yellowTile", "purpleTile"]
-    private var tiles = [SKSpriteNode]() // An array of the tiles displayed on screen
+    private var tiles = [SKSpriteNode]() // An array of tiles displayed on screen
     private var lives = [SKSpriteNode]() // An array of SpriteNodes displayed on screen to represent the user's remaining lives
     
     // Message that tells the user to tap to play (at the start of the game) and notifies the user of whether they won/lost (at the end of the game)
     private var messageLabel: SKLabelNode?
     private var gameEnded = false
 
+    // MARK: Configuring the screen boundaries
     
     override func didMove(to view: SKView) {
         configurePhysics()
@@ -56,6 +57,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         bottomOfScreen.physicsBody?.categoryBitMask = PhysicsCategories.bottom
         addChild(bottomOfScreen)
     }
+    
+    // MARK: Laying out the scene
     
     private func layoutScene() {
         createPaddle()
@@ -153,8 +156,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         label.run(SKAction.repeatForever(sequence))
     }
     
+    // MARK: Movement of ball and paddle
+    
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if gameEnded { // If the user taps the screen once the game has ended, a new game will commence
+            removeCurrentlyDisplayedLives()
             createBall()
             layoutTiles()
             gameEnded = false
@@ -163,6 +169,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             label.removeFromParent()
         }
         setInitialVelocityOfBall()
+    }
+    
+    // Called when the game ends. Removes the lives currently displayed on screen (if any)
+    private func removeCurrentlyDisplayedLives() {
+        for life in lives {
+            life.removeFromParent()
+        }
+        lives.removeAll()
     }
     
     // If the ball is not moving when the user taps the screen, the ball is given an initial velocity
